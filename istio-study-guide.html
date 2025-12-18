@@ -1,0 +1,2242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Istio Certified Associate (ICA) Study Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1a2234;
+            --bg-card: #151d2e;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --install-primary: #06b6d4;
+            --install-bg: rgba(6, 182, 212, 0.08);
+            --install-border: rgba(6, 182, 212, 0.3);
+            --traffic-primary: #8b5cf6;
+            --traffic-bg: rgba(139, 92, 246, 0.08);
+            --traffic-border: rgba(139, 92, 246, 0.3);
+            --security-primary: #10b981;
+            --security-bg: rgba(16, 185, 129, 0.08);
+            --security-border: rgba(16, 185, 129, 0.3);
+            --troubleshoot-primary: #f59e0b;
+            --troubleshoot-bg: rgba(245, 158, 11, 0.08);
+            --troubleshoot-border: rgba(245, 158, 11, 0.3);
+            --code-bg: #0d1117;
+            --code-border: #30363d;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.8;
+        }
+        .bg-mesh {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 60%);
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 24px;
+            position: relative;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px; height: 600px;
+            background: conic-gradient(from 0deg, var(--install-primary), var(--traffic-primary), var(--security-primary), var(--troubleshoot-primary), var(--install-primary));
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.2;
+            animation: rotate 20s linear infinite;
+        }
+        @keyframes rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .hero-content { position: relative; z-index: 1; }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--traffic-bg), var(--install-bg));
+            border: 1px solid var(--traffic-border);
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--traffic-primary);
+            margin-bottom: 32px;
+        }
+        .hero h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--install-primary) 50%, var(--traffic-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+        
+        /* Domain Cards */
+        .domains-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-top: 48px;
+        }
+        .domain-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        .domain-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .domain-card.install { border-color: var(--install-border); background: linear-gradient(135deg, var(--bg-card), var(--install-bg)); }
+        .domain-card.traffic { border-color: var(--traffic-border); background: linear-gradient(135deg, var(--bg-card), var(--traffic-bg)); }
+        .domain-card.security { border-color: var(--security-border); background: linear-gradient(135deg, var(--bg-card), var(--security-bg)); }
+        .domain-card.troubleshoot { border-color: var(--troubleshoot-border); background: linear-gradient(135deg, var(--bg-card), var(--troubleshoot-bg)); }
+        .domain-card.install:hover { border-color: var(--install-primary); }
+        .domain-card.traffic:hover { border-color: var(--traffic-primary); }
+        .domain-card.security:hover { border-color: var(--security-primary); }
+        .domain-card.troubleshoot:hover { border-color: var(--troubleshoot-primary); }
+        .domain-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+        .domain-card.install .domain-icon { background: var(--install-bg); }
+        .domain-card.traffic .domain-icon { background: var(--traffic-bg); }
+        .domain-card.security .domain-icon { background: var(--security-bg); }
+        .domain-card.troubleshoot .domain-icon { background: var(--troubleshoot-bg); }
+        .domain-card h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .domain-weight {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .domain-card.install .domain-weight { color: var(--install-primary); }
+        .domain-card.traffic .domain-weight { color: var(--traffic-primary); }
+        .domain-card.security .domain-weight { color: var(--security-primary); }
+        .domain-card.troubleshoot .domain-weight { color: var(--troubleshoot-primary); }
+        .progress-bar {
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            margin-top: 16px;
+            overflow: hidden;
+        }
+        .progress-fill { height: 100%; border-radius: 2px; }
+        .domain-card.install .progress-fill { background: var(--install-primary); width: 20%; }
+        .domain-card.traffic .progress-fill { background: var(--traffic-primary); width: 35%; }
+        .domain-card.security .progress-fill { background: var(--security-primary); width: 25%; }
+        .domain-card.troubleshoot .progress-fill { background: var(--troubleshoot-primary); width: 20%; }
+        
+        /* Sections */
+        .section { padding: 100px 0; position: relative; }
+        .section-header { margin-bottom: 60px; }
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+        .section.install .section-badge { background: var(--install-bg); color: var(--install-primary); border: 1px solid var(--install-border); }
+        .section.traffic .section-badge { background: var(--traffic-bg); color: var(--traffic-primary); border: 1px solid var(--traffic-border); }
+        .section.security .section-badge { background: var(--security-bg); color: var(--security-primary); border: 1px solid var(--security-border); }
+        .section.troubleshoot .section-badge { background: var(--troubleshoot-bg); color: var(--troubleshoot-primary); border: 1px solid var(--troubleshoot-border); }
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .section.install .section-title { color: var(--install-primary); }
+        .section.traffic .section-title { color: var(--traffic-primary); }
+        .section.security .section-title { color: var(--security-primary); }
+        .section.troubleshoot .section-title { color: var(--troubleshoot-primary); }
+        .section-intro {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 800px;
+        }
+        
+        /* Content Blocks */
+        .content-block {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            border: 1px solid var(--bg-tertiary);
+        }
+        .content-block h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .content-block h3::before {
+            content: '';
+            width: 4px;
+            height: 28px;
+            border-radius: 2px;
+        }
+        .section.install .content-block h3::before { background: var(--install-primary); }
+        .section.traffic .content-block h3::before { background: var(--traffic-primary); }
+        .section.security .content-block h3::before { background: var(--security-primary); }
+        .section.troubleshoot .content-block h3::before { background: var(--troubleshoot-primary); }
+        .narrative {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-size: 1.05rem;
+        }
+        .narrative strong { color: var(--text-primary); font-weight: 600; }
+        
+        /* Code Blocks */
+        .code-container { position: relative; margin: 24px 0; }
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--code-border);
+            padding: 12px 20px;
+            border-radius: 12px 12px 0 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+        .code-lang {
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .code-lang::before {
+            content: '';
+            width: 8px; height: 8px;
+            border-radius: 50%;
+        }
+        .code-lang.bash::before { background: var(--security-primary); }
+        .code-lang.yaml::before { background: var(--traffic-primary); }
+        .code-lang.output::before { background: var(--troubleshoot-primary); }
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--text-muted);
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+        .copy-btn:hover { background: var(--text-muted); color: var(--bg-primary); }
+        .copy-btn.copied { background: var(--security-primary); border-color: var(--security-primary); color: white; }
+        pre {
+            background: var(--code-bg);
+            padding: 24px;
+            border-radius: 0 0 12px 12px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            border: 1px solid var(--code-border);
+            border-top: none;
+        }
+        code { font-family: 'JetBrains Mono', monospace; }
+        .inline-code {
+            background: var(--bg-tertiary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--install-primary);
+        }
+        .comment { color: #6a737d; }
+        .keyword { color: #ff7b72; }
+        .string { color: #a5d6ff; }
+        .number { color: #79c0ff; }
+        .property { color: #7ee787; }
+        .value { color: #ffa657; }
+        
+        /* Info Boxes */
+        .info-box {
+            padding: 20px 24px;
+            border-radius: 12px;
+            margin: 24px 0;
+            display: flex;
+            gap: 16px;
+        }
+        .info-box.tip { background: var(--security-bg); border: 1px solid var(--security-border); }
+        .info-box.warning { background: var(--troubleshoot-bg); border: 1px solid var(--troubleshoot-border); }
+        .info-box.exam { background: var(--traffic-bg); border: 1px solid var(--traffic-border); }
+        .info-box.note { background: var(--install-bg); border: 1px solid var(--install-border); }
+        .info-icon { font-size: 1.5rem; flex-shrink: 0; }
+        .info-box.tip .info-icon { color: var(--security-primary); }
+        .info-box.warning .info-icon { color: var(--troubleshoot-primary); }
+        .info-box.exam .info-icon { color: var(--traffic-primary); }
+        .info-box.note .info-icon { color: var(--install-primary); }
+        .info-content h4 { font-weight: 600; margin-bottom: 4px; }
+        .info-box.tip .info-content h4 { color: var(--security-primary); }
+        .info-box.warning .info-content h4 { color: var(--troubleshoot-primary); }
+        .info-box.exam .info-content h4 { color: var(--traffic-primary); }
+        .info-box.note .info-content h4 { color: var(--install-primary); }
+        .info-content p { color: var(--text-secondary); font-size: 0.95rem; }
+        
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin: 24px 0;
+            border-radius: 12px;
+            border: 1px solid var(--bg-tertiary);
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        th {
+            background: var(--bg-tertiary);
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        td {
+            padding: 14px 20px;
+            border-top: 1px solid var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+        tr:hover td { background: var(--bg-tertiary); }
+        
+        /* Lab Box */
+        .lab-box {
+            background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-card));
+            border-radius: 20px;
+            padding: 32px;
+            margin: 32px 0;
+            border: 2px dashed var(--traffic-border);
+            position: relative;
+        }
+        .lab-box::before {
+            content: '🧪 HANDS-ON LAB';
+            position: absolute;
+            top: -12px;
+            left: 24px;
+            background: var(--traffic-primary);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .lab-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            margin-top: 8px;
+            color: var(--traffic-primary);
+        }
+        
+        /* Checklist */
+        .checklist {
+            background: var(--bg-tertiary);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 32px 0;
+        }
+        .checklist h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+            color: var(--traffic-primary);
+        }
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--bg-card);
+            color: var(--text-secondary);
+        }
+        .checklist-item:last-child { border-bottom: none; }
+        .check-box {
+            width: 22px; height: 22px;
+            border: 2px solid var(--text-muted);
+            border-radius: 6px;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .check-box:hover { border-color: var(--security-primary); }
+        .check-box.checked {
+            background: var(--security-primary);
+            border-color: var(--security-primary);
+        }
+        .check-box.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--bg-secondary);
+            padding: 60px 24px;
+            text-align: center;
+            border-top: 1px solid var(--bg-tertiary);
+        }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .footer-links a:hover { color: var(--traffic-primary); }
+        .footer-credit { color: var(--text-muted); font-size: 0.9rem; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content-block { padding: 24px; }
+            .hero::before { width: 300px; height: 300px; }
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="bg-mesh"></div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span>📚</span>
+                <span>CNCF Certification Study Guide</span>
+            </div>
+            <h1>Istio Certified Associate</h1>
+            <p class="hero-subtitle">
+                Master the service mesh fundamentals with this comprehensive, hands-on study guide. 
+                Practice every concept with real YAML configurations and istioctl commands.
+            </p>
+            
+            <div class="domains-grid">
+                <a href="#install" class="domain-card install">
+                    <div class="domain-icon">⚙️</div>
+                    <h3>Installation & Configuration</h3>
+                    <div class="domain-weight">20%</div>
+                    <div class="progress-bar"><div class="progress-fill"></div></div>
+                </a>
+                <a href="#traffic" class="domain-card traffic">
+                    <div class="domain-icon">🔀</div>
+                    <h3>Traffic Management</h3>
+                    <div class="domain-weight">35%</div>
+                    <div class="progress-bar"><div class="progress-fill"></div></div>
+                </a>
+                <a href="#security" class="domain-card security">
+                    <div class="domain-icon">🔐</div>
+                    <h3>Securing Workloads</h3>
+                    <div class="domain-weight">20%</div>
+                    <div class="progress-bar"><div class="progress-fill"></div></div>
+                </a>
+                <a href="#troubleshoot" class="domain-card troubleshoot">
+                    <div class="domain-icon">🔧</div>
+                    <h3>Troubleshooting</h3>
+                    <div class="domain-weight">20%</div>
+                    <div class="progress-bar"><div class="progress-fill"></div></div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About This Guide -->
+    <section class="section" style="padding: 60px 0 40px;">
+        <div class="container">
+            <div class="content-block" style="background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-tertiary) 100%);">
+                <h3>📘 About This Study Guide</h3>
+                <p class="narrative">
+                    This comprehensive study guide covers all four domains of the <strong>Istio Certified Associate (ICA)</strong> exam. Each section provides conceptual explanations, hands-on examples, and exam-focused tips to help you understand not just the "how" but also the "why" behind Istio's service mesh capabilities.
+                </p>
+                <p class="narrative">
+                    The guide is designed for hands-on learning. All YAML configurations and commands have been verified for <strong>Istio 1.28.x</strong>. You're encouraged to practice each concept in a real Kubernetes environment as you study.
+                </p>
+                
+                <div class="features-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 24px;">
+                    <div class="feature-item" style="display: flex; align-items: flex-start; gap: 12px; padding: 16px; background: var(--bg-primary); border-radius: 12px;">
+                        <span style="font-size: 1.3rem;">🎯</span>
+                        <div>
+                            <strong style="color: var(--text-primary); display: block; margin-bottom: 4px;">Exam-Aligned</strong>
+                            <span style="color: var(--text-secondary); font-size: 0.9rem;">Content mapped to official exam objectives</span>
+                        </div>
+                    </div>
+                    <div class="feature-item" style="display: flex; align-items: flex-start; gap: 12px; padding: 16px; background: var(--bg-primary); border-radius: 12px;">
+                        <span style="font-size: 1.3rem;">💻</span>
+                        <div>
+                            <strong style="color: var(--text-primary); display: block; margin-bottom: 4px;">Hands-On Labs</strong>
+                            <span style="color: var(--text-secondary); font-size: 0.9rem;">Real commands and YAML you can practice</span>
+                        </div>
+                    </div>
+                    <div class="feature-item" style="display: flex; align-items: flex-start; gap: 12px; padding: 16px; background: var(--bg-primary); border-radius: 12px;">
+                        <span style="font-size: 1.3rem;">💡</span>
+                        <div>
+                            <strong style="color: var(--text-primary); display: block; margin-bottom: 4px;">Exam Tips</strong>
+                            <span style="color: var(--text-secondary); font-size: 0.9rem;">Pro tips and common pitfalls highlighted</span>
+                        </div>
+                    </div>
+                    <div class="feature-item" style="display: flex; align-items: flex-start; gap: 12px; padding: 16px; background: var(--bg-primary); border-radius: 12px;">
+                        <span style="font-size: 1.3rem;">✅</span>
+                        <div>
+                            <strong style="color: var(--text-primary); display: block; margin-bottom: 4px;">Checklists</strong>
+                            <span style="color: var(--text-secondary); font-size: 0.9rem;">Track your progress for each domain</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lab Environment -->
+    <section class="section" style="padding: 20px 0 60px;">
+        <div class="container">
+            <div class="content-block" style="border: 1px solid var(--install-border);">
+                <h3>🖥️ Lab Environment Options</h3>
+                <p class="narrative">
+                    Practice the concepts in this guide using any Kubernetes environment with Istio installed. Choose the option that works best for you:
+                </p>
+                
+                <div class="table-container" style="margin-top: 20px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Environment</th>
+                                <th>Options</th>
+                                <th>Best For</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>☁️ Cloud Playgrounds</strong></td>
+                                <td>KodeKloud, Killercoda, Play with Kubernetes</td>
+                                <td>Quick practice, no setup required</td>
+                            </tr>
+                            <tr>
+                                <td><strong>💻 Local Clusters</strong></td>
+                                <td>Minikube, kind, k3d, Docker Desktop</td>
+                                <td>Offline practice, full control</td>
+                            </tr>
+                            <tr>
+                                <td><strong>🏢 Managed K8s</strong></td>
+                                <td>GKE, EKS, AKS with Istio addon</td>
+                                <td>Production-like experience</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box note" style="margin-top: 20px;">
+                    <div class="info-icon">⚙️</div>
+                    <div class="info-content">
+                        <h4>Required Tools</h4>
+                        <p><strong>kubectl</strong> (Kubernetes CLI), <strong>istioctl</strong> (Istio CLI, version 1.28.x recommended), and cluster admin access. Most cloud playgrounds come pre-configured with these tools.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Exam Overview -->
+    <section class="section" style="padding-top: 20px;">
+        <div class="container">
+            <div class="content-block">
+                <h3>🎯 Exam Overview & Format</h3>
+                <p class="narrative">
+                    The <strong>Istio Certified Associate (ICA)</strong> exam validates your foundational knowledge of Istio service mesh concepts, architecture, and hands-on operational skills. The exam combines <strong>performance-based tasks</strong> with multiple-choice questions, meaning you'll need to demonstrate real ability to configure and troubleshoot Istio installations.
+                </p>
+                
+                <div class="table-container" style="margin: 24px 0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Exam Detail</th>
+                                <th>Information</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Duration</strong></td><td>2 hours</td></tr>
+                            <tr><td><strong>Passing Score</strong></td><td>75%</td></tr>
+                            <tr><td><strong>Cost</strong></td><td>$250 USD (includes one free retake)</td></tr>
+                            <tr><td><strong>Format</strong></td><td>Performance-based + Multiple choice</td></tr>
+                            <tr><td><strong>Certification Validity</strong></td><td>3 years</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box exam">
+                    <div class="info-icon">🎯</div>
+                    <div class="info-content">
+                        <h4>Exam Strategy</h4>
+                        <p>Since Traffic Management represents 35% of your score, invest proportionally more study time there. However, don't neglect Troubleshooting—those skills are essential across all domains and will help you debug issues in every topic area.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Domain 1: Installation -->
+    <section id="install" class="section install">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">Domain 1 • 20% Weight</div>
+                <h2 class="section-title">Installation, Upgrade & Configuration</h2>
+                <p class="section-intro">
+                    This domain tests your ability to deploy Istio using different methods, customize installations to match requirements, 
+                    and safely upgrade production meshes without downtime.
+                </p>
+            </div>
+
+            <div class="content-block">
+                <h3>Installing Istio with istioctl</h3>
+                <p class="narrative">
+                    Think of <strong>istioctl</strong> as your primary interface to the Istio control plane. It's more than just an installer—it's a comprehensive diagnostic and management tool that understands Istio's architecture deeply. When you install Istio using istioctl, you're leveraging the <strong>IstioOperator API</strong>, which provides a declarative way to specify exactly what you want installed and how it should be configured.
+                </p>
+                <p class="narrative">
+                    The beauty of istioctl's approach is in its <strong>installation profiles</strong>. Rather than starting from scratch every time, Istio provides pre-configured profiles optimized for different scenarios. The <strong>default</strong> profile gives you a production-ready starting point with just the control plane (istiod) and an ingress gateway. The <strong>demo</strong> profile enables nearly everything—it's designed for learning and evaluation.
+                </p>
+
+                <div class="lab-box">
+                    <div class="lab-title">Getting Started with Istio Installation</div>
+                    <p style="color: var(--text-secondary); margin-bottom: 16px;">If your environment has Istio pre-installed, verify it. Otherwise, you can install Istio using the commands below.</p>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang bash">bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="comment"># Verify istioctl is available</span>
+istioctl version
+
+<span class="comment"># List all available installation profiles</span>
+istioctl profile list
+
+<span class="comment"># View the complete configuration for a profile</span>
+istioctl profile dump demo
+
+<span class="comment"># Compare two profiles to understand differences</span>
+istioctl profile diff default demo
+
+<span class="comment"># Check current installation status</span>
+kubectl get pods -n istio-system
+
+<span class="comment"># Run pre-installation checks</span>
+istioctl x precheck</pre>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Profile</th>
+                                <th>Use Case</th>
+                                <th>Components Installed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="inline-code">default</span></td>
+                                <td>Production starting point</td>
+                                <td>istiod, Ingress Gateway</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">demo</span></td>
+                                <td>Learning and evaluation</td>
+                                <td>All components, higher trace sampling</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">minimal</span></td>
+                                <td>Control plane only</td>
+                                <td>istiod only (no gateways)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">ambient</span></td>
+                                <td>Sidecar-less mesh</td>
+                                <td>istiod, CNI, ztunnel</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">empty</span></td>
+                                <td>Base for custom profiles</td>
+                                <td>Nothing (define everything yourself)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box tip">
+                    <div class="info-icon">💡</div>
+                    <div class="info-content">
+                        <h4>Pro Tip</h4>
+                        <p>Always run <span class="inline-code">istioctl x precheck</span> before installing or upgrading. This command validates that your cluster meets Istio's requirements and identifies potential issues before they cause problems.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Customizing Your Istio Installation</h3>
+                <p class="narrative">
+                    While profiles provide excellent starting points, real-world deployments almost always require customization. The <strong>IstioOperator API</strong> gives you fine-grained control over every aspect of your installation. You can override individual settings using <span class="inline-code">--set</span> flags directly on the command line, or define a complete IstioOperator manifest for more complex configurations.
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang yaml">custom-install.yaml</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="keyword">apiVersion:</span> <span class="string">install.istio.io/v1alpha1</span>
+<span class="keyword">kind:</span> <span class="string">IstioOperator</span>
+<span class="keyword">metadata:</span>
+  <span class="property">namespace:</span> <span class="string">istio-system</span>
+  <span class="property">name:</span> <span class="string">istio-control-plane</span>
+<span class="keyword">spec:</span>
+  <span class="property">profile:</span> <span class="string">default</span>
+  
+  <span class="comment"># Mesh-wide configuration settings</span>
+  <span class="property">meshConfig:</span>
+    <span class="property">accessLogFile:</span> <span class="string">/dev/stdout</span>
+    <span class="property">accessLogEncoding:</span> <span class="string">JSON</span>
+    <span class="property">enableTracing:</span> <span class="value">true</span>
+    <span class="property">defaultConfig:</span>
+      <span class="property">tracing:</span>
+        <span class="property">sampling:</span> <span class="number">100.0</span>
+      <span class="property">holdApplicationUntilProxyStarts:</span> <span class="value">true</span>
+    <span class="property">outboundTrafficPolicy:</span>
+      <span class="property">mode:</span> <span class="string">REGISTRY_ONLY</span>
+  
+  <span class="comment"># Component-level configuration</span>
+  <span class="property">components:</span>
+    <span class="property">pilot:</span>
+      <span class="property">enabled:</span> <span class="value">true</span>
+      <span class="property">k8s:</span>
+        <span class="property">resources:</span>
+          <span class="property">requests:</span>
+            <span class="property">cpu:</span> <span class="string">500m</span>
+            <span class="property">memory:</span> <span class="string">2Gi</span>
+    <span class="property">ingressGateways:</span>
+    - <span class="property">name:</span> <span class="string">istio-ingressgateway</span>
+      <span class="property">enabled:</span> <span class="value">true</span></pre>
+                </div>
+
+                <div class="info-box note">
+                    <div class="info-icon">📝</div>
+                    <div class="info-content">
+                        <h4>Understanding outboundTrafficPolicy</h4>
+                        <p>The <span class="inline-code">REGISTRY_ONLY</span> mode restricts outbound traffic to services defined in Istio's service registry. This is more secure but requires ServiceEntry resources for external services. <span class="inline-code">ALLOW_ANY</span> permits traffic to any destination.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Sidecar Mode vs. Ambient Mode</h3>
+                <p class="narrative">
+                    Istio's traditional architecture uses the <strong>sidecar pattern</strong>—an Envoy proxy container is injected into every application pod, intercepting all network traffic for that workload. This approach provides comprehensive L4/L7 traffic management but adds resource overhead to every pod in your mesh.
+                </p>
+                <p class="narrative">
+                    <strong>Ambient mode</strong> represents Istio's answer to this challenge. Instead of per-pod sidecars, ambient mode uses a shared <strong>ztunnel</strong> component running on each node that handles L4 security (mTLS) for all pods on that node. For workloads needing L7 features, you deploy <strong>waypoint proxies</strong>. This architecture can reduce proxy resource usage by up to 90%.
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang bash">bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="comment"># Enable SIDECAR injection for a namespace</span>
+kubectl label namespace default istio-injection=enabled
+
+<span class="comment"># Verify namespace labels</span>
+kubectl get namespace -L istio-injection
+
+<span class="comment"># Enable AMBIENT mode for a namespace (alternative)</span>
+kubectl label namespace default istio.io/dataplane-mode=ambient
+
+<span class="comment"># Check which mode is enabled</span>
+kubectl get namespaces -L istio-injection,istio.io/dataplane-mode
+
+<span class="comment"># Disable injection for specific pod (annotation)</span>
+<span class="comment"># sidecar.istio.io/inject: "false"</span></pre>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Canary Upgrades</h3>
+                <p class="narrative">
+                    Upgrading a service mesh in production requires careful planning. Istio supports <strong>canary upgrades</strong> which run multiple control plane versions simultaneously, enabling gradual workload migration and safe rollback. Each control plane installation gets a unique <strong>revision</strong> label, and namespaces are labeled to indicate which revision they should use.
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang bash">bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="comment"># Step 1: Install new revision alongside existing</span>
+istioctl install --set revision=1-21-0
+
+<span class="comment"># Verify both control planes running</span>
+kubectl get pods -n istio-system -l app=istiod
+
+<span class="comment"># Step 2: Migrate namespaces to new revision</span>
+kubectl label namespace test-ns istio-injection- istio.io/rev=1-21-0
+
+<span class="comment"># Step 3: Restart workloads to get new sidecars</span>
+kubectl rollout restart deployment -n test-ns
+
+<span class="comment"># Step 4: Verify migration</span>
+istioctl proxy-status
+
+<span class="comment"># Step 5: After migrating ALL namespaces, remove old revision</span>
+istioctl uninstall --revision 1-20-1 -y</pre>
+                </div>
+
+                <div class="info-box warning">
+                    <div class="info-icon">⚠️</div>
+                    <div class="info-content">
+                        <h4>Important Upgrade Consideration</h4>
+                        <p>After changing namespace labels or revision tags, existing pods still run with their old sidecar version. You must restart pods (using <span class="inline-code">kubectl rollout restart</span>) for them to receive the new sidecar version.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checklist">
+                <h3>📋 Domain 1 Exam Checklist</h3>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Install Istio with istioctl using different profiles (default, demo, minimal)</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Create and apply custom IstioOperator configurations</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Enable sidecar injection for namespaces and verify injection</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Understand sidecar vs ambient mode differences</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Perform a canary upgrade using revisions</span>
+                </div>
+            </div>
+
+            <!-- Domain 1 Key Concepts -->
+            <div class="content-block" style="background: linear-gradient(135deg, var(--bg-card), var(--install-bg));">
+                <h3>🔑 Key Concepts to Memorize</h3>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Concept</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Sidecar Injection Label</strong></td><td><span class="inline-code">istio-injection=enabled</span></td></tr>
+                            <tr><td><strong>Ambient Mode Label</strong></td><td><span class="inline-code">istio.io/dataplane-mode=ambient</span></td></tr>
+                            <tr><td><strong>Disable Injection (Pod)</strong></td><td><span class="inline-code">sidecar.istio.io/inject: "false"</span></td></tr>
+                            <tr><td><strong>Revision Label</strong></td><td><span class="inline-code">istio.io/rev=&lt;revision&gt;</span></td></tr>
+                            <tr><td><strong>Control Plane Namespace</strong></td><td><span class="inline-code">istio-system</span></td></tr>
+                            <tr><td><strong>Control Plane Component</strong></td><td><span class="inline-code">istiod</span> (Pilot, Citadel, Galley combined)</td></tr>
+                            <tr><td><strong>Default Profile Components</strong></td><td>istiod + Ingress Gateway</td></tr>
+                            <tr><td><strong>Demo Profile</strong></td><td>All components + higher trace sampling</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box exam" style="margin-top: 20px;">
+                    <div class="info-icon">🎯</div>
+                    <div class="info-content">
+                        <h4>Exam Scenario: Installation Troubleshooting</h4>
+                        <p>If pods don't get sidecars after labeling namespace: (1) Check namespace label exists, (2) Verify istio-sidecar-injector webhook, (3) <strong>Restart pods</strong> - existing pods won't automatically get sidecars!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Domain 1 References -->
+            <div class="content-block">
+                <h3>📚 Official Documentation References</h3>
+                <p class="narrative">Bookmark these pages for exam preparation and quick reference:</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 16px;">
+                    <a href="https://istio.io/latest/docs/setup/install/istioctl/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--install-primary); display: block;">Install with istioctl</strong>Installation methods and profiles</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/setup/additional-setup/sidecar-injection/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--install-primary); display: block;">Sidecar Injection</strong>Automatic and manual injection</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/setup/upgrade/canary/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--install-primary); display: block;">Canary Upgrades</strong>Revision-based upgrades</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/reference/config/istio.operator.v1alpha1/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--install-primary); display: block;">IstioOperator API</strong>Configuration reference</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/ops/configuration/mesh/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--install-primary); display: block;">MeshConfig</strong>Mesh-wide configuration options</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/ambient/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--install-primary); display: block;">Ambient Mode</strong>Sidecar-less architecture</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Domain 2: Traffic Management -->
+    <section id="traffic" class="section traffic">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">Domain 2 • 35% Weight</div>
+                <h2 class="section-title">Traffic Management</h2>
+                <p class="section-intro">
+                    This is the largest domain, and for good reason—traffic management is at the heart of what makes a service mesh valuable.
+                    You'll learn to control how requests flow through your mesh using Gateways, VirtualServices, and DestinationRules.
+                </p>
+            </div>
+
+            <div class="content-block">
+                <h3>Setting Up the Practice Environment</h3>
+                <p class="narrative">
+                    Before diving into traffic management, let's deploy the <strong>Bookinfo sample application</strong> that we'll use throughout this section. This microservices application includes productpage, details, reviews (v1, v2, v3), and ratings services—perfect for practicing routing scenarios.
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang bash">bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="comment"># Ensure sidecar injection is enabled</span>
+kubectl label namespace default istio-injection=enabled --overwrite
+
+<span class="comment"># Deploy the Bookinfo application</span>
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/bookinfo/platform/kube/bookinfo.yaml
+
+<span class="comment"># Wait for all pods to be ready</span>
+kubectl get pods -w
+
+<span class="comment"># Deploy the Gateway and VirtualService for external access</span>
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/bookinfo/networking/bookinfo-gateway.yaml
+
+<span class="comment"># Deploy destination rules (defines subsets)</span>
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/bookinfo/networking/destination-rule-all.yaml
+
+<span class="comment"># Verify the application</span>
+kubectl exec "$(kubectl get pod -l app=ratings -o jsonpath='{.items[0].metadata.name}')" \
+  -c ratings -- curl -s productpage:9080/productpage | grep -o "&lt;title&gt;.*&lt;/title&gt;"</pre>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Configuring Ingress with Gateway</h3>
+                <p class="narrative">
+                    The <strong>Gateway</strong> resource is your mesh's front door—it configures the load balancer that sits at the edge of your service mesh, accepting traffic from outside and directing it inward. Think of it as configuring the "what" of edge traffic: which ports to listen on, which protocols to accept, and which hostnames to serve.
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang yaml">bookinfo-gateway.yaml</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="keyword">apiVersion:</span> <span class="string">networking.istio.io/v1</span>
+<span class="keyword">kind:</span> <span class="string">Gateway</span>
+<span class="keyword">metadata:</span>
+  <span class="property">name:</span> <span class="string">bookinfo-gateway</span>
+<span class="keyword">spec:</span>
+  <span class="property">selector:</span>
+    <span class="property">istio:</span> <span class="string">ingressgateway</span>
+  <span class="property">servers:</span>
+  - <span class="property">port:</span>
+      <span class="property">number:</span> <span class="number">80</span>
+      <span class="property">name:</span> <span class="string">http</span>
+      <span class="property">protocol:</span> <span class="string">HTTP</span>
+    <span class="property">hosts:</span>
+    - <span class="string">"*"</span></pre>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Configuring Routing with VirtualService</h3>
+                <p class="narrative">
+                    The <strong>VirtualService</strong> is where the real routing magic happens. While a Gateway just opens the door, the VirtualService decides where each request should go based on its characteristics—URI paths, HTTP headers, query parameters, or percentage-based weights for canary deployments.
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang yaml">reviews-routing.yaml</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="keyword">apiVersion:</span> <span class="string">networking.istio.io/v1</span>
+<span class="keyword">kind:</span> <span class="string">VirtualService</span>
+<span class="keyword">metadata:</span>
+  <span class="property">name:</span> <span class="string">reviews</span>
+<span class="keyword">spec:</span>
+  <span class="property">hosts:</span>
+  - <span class="string">reviews</span>
+  <span class="property">http:</span>
+  <span class="comment"># Route user "jason" to reviews v2 (black stars)</span>
+  - <span class="property">match:</span>
+    - <span class="property">headers:</span>
+        <span class="property">end-user:</span>
+          <span class="property">exact:</span> <span class="string">jason</span>
+    <span class="property">route:</span>
+    - <span class="property">destination:</span>
+        <span class="property">host:</span> <span class="string">reviews</span>
+        <span class="property">subset:</span> <span class="string">v2</span>
+  <span class="comment"># Default: Everyone else goes to v1 (no stars)</span>
+  - <span class="property">route:</span>
+    - <span class="property">destination:</span>
+        <span class="property">host:</span> <span class="string">reviews</span>
+        <span class="property">subset:</span> <span class="string">v1</span></pre>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Defining Traffic Policies with DestinationRule</h3>
+                <p class="narrative">
+                    If VirtualService is about routing (which version to send traffic to), <strong>DestinationRule</strong> is about policy (how to communicate with that version). DestinationRules define traffic policies that apply <em>after</em> routing decisions are made—load balancing algorithms, connection pooling, outlier detection for circuit breaking, and TLS settings.
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang yaml">reviews-destination-rule.yaml</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="keyword">apiVersion:</span> <span class="string">networking.istio.io/v1</span>
+<span class="keyword">kind:</span> <span class="string">DestinationRule</span>
+<span class="keyword">metadata:</span>
+  <span class="property">name:</span> <span class="string">reviews</span>
+<span class="keyword">spec:</span>
+  <span class="property">host:</span> <span class="string">reviews</span>
+  <span class="property">trafficPolicy:</span>
+    <span class="property">loadBalancer:</span>
+      <span class="property">simple:</span> <span class="string">ROUND_ROBIN</span>
+    <span class="property">connectionPool:</span>
+      <span class="property">tcp:</span>
+        <span class="property">maxConnections:</span> <span class="number">100</span>
+      <span class="property">http:</span>
+        <span class="property">http1MaxPendingRequests:</span> <span class="number">100</span>
+    <span class="property">outlierDetection:</span>
+      <span class="property">consecutive5xxErrors:</span> <span class="number">5</span>
+      <span class="property">interval:</span> <span class="string">10s</span>
+      <span class="property">baseEjectionTime:</span> <span class="string">30s</span>
+  <span class="property">subsets:</span>
+  - <span class="property">name:</span> <span class="string">v1</span>
+    <span class="property">labels:</span>
+      <span class="property">version:</span> <span class="string">v1</span>
+  - <span class="property">name:</span> <span class="string">v2</span>
+    <span class="property">labels:</span>
+      <span class="property">version:</span> <span class="string">v2</span>
+  - <span class="property">name:</span> <span class="string">v3</span>
+    <span class="property">labels:</span>
+      <span class="property">version:</span> <span class="string">v3</span></pre>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Traffic Shifting (Canary Deployments)</h3>
+                <p class="narrative">
+                    <strong>Traffic shifting</strong> enables safe, gradual rollouts of new service versions. Instead of switching all traffic at once, you can shift 1%, then 5%, then 20%, monitoring metrics at each stage. If problems emerge, simply adjust the weights back—no redeployment required.
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang yaml">traffic-shifting.yaml</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="keyword">apiVersion:</span> <span class="string">networking.istio.io/v1</span>
+<span class="keyword">kind:</span> <span class="string">VirtualService</span>
+<span class="keyword">metadata:</span>
+  <span class="property">name:</span> <span class="string">reviews</span>
+<span class="keyword">spec:</span>
+  <span class="property">hosts:</span>
+  - <span class="string">reviews</span>
+  <span class="property">http:</span>
+  - <span class="property">route:</span>
+    - <span class="property">destination:</span>
+        <span class="property">host:</span> <span class="string">reviews</span>
+        <span class="property">subset:</span> <span class="string">v1</span>
+      <span class="property">weight:</span> <span class="number">80</span>
+    - <span class="property">destination:</span>
+        <span class="property">host:</span> <span class="string">reviews</span>
+        <span class="property">subset:</span> <span class="string">v3</span>
+      <span class="property">weight:</span> <span class="number">20</span></pre>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>External Services with ServiceEntry</h3>
+                <p class="narrative">
+                    <strong>ServiceEntry</strong> adds external services to Istio's service registry, enabling traffic management and observability for external API calls. When <span class="inline-code">outboundTrafficPolicy.mode: REGISTRY_ONLY</span> is set, the mesh will block traffic to services not in the registry.
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang yaml">external-service.yaml</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="keyword">apiVersion:</span> <span class="string">networking.istio.io/v1</span>
+<span class="keyword">kind:</span> <span class="string">ServiceEntry</span>
+<span class="keyword">metadata:</span>
+  <span class="property">name:</span> <span class="string">httpbin-ext</span>
+<span class="keyword">spec:</span>
+  <span class="property">hosts:</span>
+  - <span class="string">httpbin.org</span>
+  <span class="property">ports:</span>
+  - <span class="property">number:</span> <span class="number">443</span>
+    <span class="property">name:</span> <span class="string">https</span>
+    <span class="property">protocol:</span> <span class="string">TLS</span>
+  <span class="property">location:</span> <span class="string">MESH_EXTERNAL</span>
+  <span class="property">resolution:</span> <span class="string">DNS</span></pre>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Resilience: Timeouts, Retries, Circuit Breaking</h3>
+                <p class="narrative">
+                    Istio provides several resilience patterns—<strong>timeouts</strong>, <strong>retries</strong>, <strong>circuit breaking</strong>, and <strong>outlier detection</strong>—that protect your system from cascading failures without requiring application code changes.
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang yaml">resilience-config.yaml</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="keyword">apiVersion:</span> <span class="string">networking.istio.io/v1</span>
+<span class="keyword">kind:</span> <span class="string">VirtualService</span>
+<span class="keyword">metadata:</span>
+  <span class="property">name:</span> <span class="string">ratings</span>
+<span class="keyword">spec:</span>
+  <span class="property">hosts:</span>
+  - <span class="string">ratings</span>
+  <span class="property">http:</span>
+  - <span class="property">route:</span>
+    - <span class="property">destination:</span>
+        <span class="property">host:</span> <span class="string">ratings</span>
+    <span class="property">timeout:</span> <span class="string">10s</span>
+    <span class="property">retries:</span>
+      <span class="property">attempts:</span> <span class="number">3</span>
+      <span class="property">perTryTimeout:</span> <span class="string">3s</span>
+      <span class="property">retryOn:</span> <span class="string">5xx,reset,connect-failure</span></pre>
+                </div>
+
+                <div class="info-box exam">
+                    <div class="info-icon">🎯</div>
+                    <div class="info-content">
+                        <h4>Exam Focus: Where to Configure What</h4>
+                        <p><strong>VirtualService:</strong> Timeouts, retries, fault injection, routing rules<br>
+                        <strong>DestinationRule:</strong> Load balancing, connection pools, circuit breaking, TLS settings, subsets</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Fault Injection for Testing</h3>
+                <p class="narrative">
+                    <strong>Fault injection</strong> lets you simulate failures in a controlled way. Inject <strong>delays</strong> to test timeout handling, or inject <strong>aborts</strong> (HTTP errors) to verify error handling. You can target specific users via headers or affect a percentage of all traffic.
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang yaml">fault-injection.yaml</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="keyword">apiVersion:</span> <span class="string">networking.istio.io/v1</span>
+<span class="keyword">kind:</span> <span class="string">VirtualService</span>
+<span class="keyword">metadata:</span>
+  <span class="property">name:</span> <span class="string">ratings</span>
+<span class="keyword">spec:</span>
+  <span class="property">hosts:</span>
+  - <span class="string">ratings</span>
+  <span class="property">http:</span>
+  - <span class="property">match:</span>
+    - <span class="property">headers:</span>
+        <span class="property">end-user:</span>
+          <span class="property">exact:</span> <span class="string">jason</span>
+    <span class="property">fault:</span>
+      <span class="property">delay:</span>
+        <span class="property">percentage:</span>
+          <span class="property">value:</span> <span class="number">100</span>
+        <span class="property">fixedDelay:</span> <span class="string">7s</span>
+    <span class="property">route:</span>
+    - <span class="property">destination:</span>
+        <span class="property">host:</span> <span class="string">ratings</span>
+  - <span class="property">route:</span>
+    - <span class="property">destination:</span>
+        <span class="property">host:</span> <span class="string">ratings</span></pre>
+                </div>
+            </div>
+
+            <div class="checklist">
+                <h3>📋 Domain 2 Exam Checklist</h3>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Create Gateway resources for ingress traffic</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Configure VirtualService with URI, header, and weight-based routing</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Define DestinationRule subsets and traffic policies</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Implement traffic shifting for canary deployments</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Create ServiceEntry for external services</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Configure timeouts, retries, and circuit breaking</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Inject faults (delays and aborts) for testing</span>
+                </div>
+            </div>
+
+            <!-- Domain 2 Key Concepts -->
+            <div class="content-block" style="background: linear-gradient(135deg, var(--bg-card), var(--traffic-bg));">
+                <h3>🔑 Key Concepts to Memorize</h3>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Resource</th>
+                                <th>Purpose</th>
+                                <th>Key Fields</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Gateway</strong></td><td>Edge load balancer configuration</td><td>selector, servers (port, hosts, tls)</td></tr>
+                            <tr><td><strong>VirtualService</strong></td><td>Routing rules (WHERE to send)</td><td>hosts, gateways, http (match, route, timeout, retries, fault)</td></tr>
+                            <tr><td><strong>DestinationRule</strong></td><td>Traffic policies (HOW to communicate)</td><td>host, trafficPolicy, subsets</td></tr>
+                            <tr><td><strong>ServiceEntry</strong></td><td>Add external services to registry</td><td>hosts, ports, location, resolution</td></tr>
+                            <tr><td><strong>Sidecar</strong></td><td>Limit proxy scope</td><td>workloadSelector, egress</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-container" style="margin-top: 20px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Load Balancer Mode</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="inline-code">ROUND_ROBIN</span></td><td>Default, cycles through endpoints</td></tr>
+                            <tr><td><span class="inline-code">LEAST_REQUEST</span></td><td>Routes to endpoint with fewest active requests</td></tr>
+                            <tr><td><span class="inline-code">RANDOM</span></td><td>Random selection</td></tr>
+                            <tr><td><span class="inline-code">PASSTHROUGH</span></td><td>Direct connection to original destination</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box exam" style="margin-top: 20px;">
+                    <div class="info-icon">🎯</div>
+                    <div class="info-content">
+                        <h4>Exam Gotcha: VirtualService + DestinationRule</h4>
+                        <p>A VirtualService routing to a <span class="inline-code">subset</span> requires a DestinationRule that defines that subset. Without it, you'll get "no healthy upstream" errors. Always create the DestinationRule first!</p>
+                    </div>
+                </div>
+
+                <div class="info-box warning" style="margin-top: 16px;">
+                    <div class="info-icon">⚠️</div>
+                    <div class="info-content">
+                        <h4>Common Exam Mistake: Traffic Weights</h4>
+                        <p>Traffic weights must add up to 100. If using two destinations with weights 80/20, both must be specified. Also remember: weights are specified in VirtualService, subsets are defined in DestinationRule.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Domain 2 References -->
+            <div class="content-block">
+                <h3>📚 Official Documentation References</h3>
+                <p class="narrative">Bookmark these pages for exam preparation and quick reference:</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 16px;">
+                    <a href="https://istio.io/latest/docs/reference/config/networking/gateway/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--traffic-primary); display: block;">Gateway Reference</strong>Edge traffic configuration</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/reference/config/networking/virtual-service/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--traffic-primary); display: block;">VirtualService Reference</strong>Routing rules and match conditions</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/reference/config/networking/destination-rule/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--traffic-primary); display: block;">DestinationRule Reference</strong>Subsets and traffic policies</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/reference/config/networking/service-entry/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--traffic-primary); display: block;">ServiceEntry Reference</strong>External service registration</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/tasks/traffic-management/fault-injection/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--traffic-primary); display: block;">Fault Injection</strong>Testing with delays and aborts</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/tasks/traffic-management/circuit-breaking/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--traffic-primary); display: block;">Circuit Breaking</strong>Resilience patterns</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/tasks/traffic-management/request-timeouts/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--traffic-primary); display: block;">Timeouts & Retries</strong>Request resilience</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/tasks/traffic-management/mirroring/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--traffic-primary); display: block;">Traffic Mirroring</strong>Shadow traffic for testing</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Domain 3: Security -->
+    <section id="security" class="section security">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">Domain 3 • 25% Weight</div>
+                <h2 class="section-title">Securing Workloads</h2>
+                <p class="section-intro">
+                    Security is foundational to Istio's value proposition. This domain covers authentication (proving identity with mTLS and JWT), 
+                    authorization (controlling who can access what), and securing edge traffic with TLS.
+                </p>
+            </div>
+
+            <div class="content-block">
+                <h3>Configuring mTLS with PeerAuthentication</h3>
+                <p class="narrative">
+                    <strong>Mutual TLS (mTLS)</strong> is one of Istio's most valuable security features. With mTLS, both the client and server present certificates to prove their identity. Istio manages the certificate lifecycle automatically—each workload gets a SPIFFE identity and short-lived X.509 certificate that's automatically rotated.
+                </p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>mTLS Mode</th>
+                                <th>Behavior</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="inline-code">STRICT</span></td>
+                                <td>Only accept mTLS connections</td>
+                                <td>Production, security-critical workloads</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">PERMISSIVE</span></td>
+                                <td>Accept both mTLS and plaintext</td>
+                                <td>Migration, mixed environments</td>
+                            </tr>
+                            <tr>
+                                <td><span class="inline-code">DISABLE</span></td>
+                                <td>Don't use mTLS for this scope</td>
+                                <td>Legacy services that can't use TLS</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang yaml">peer-authentication.yaml</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="comment"># Mesh-wide STRICT mTLS</span>
+<span class="keyword">apiVersion:</span> <span class="string">security.istio.io/v1</span>
+<span class="keyword">kind:</span> <span class="string">PeerAuthentication</span>
+<span class="keyword">metadata:</span>
+  <span class="property">name:</span> <span class="string">default</span>
+  <span class="property">namespace:</span> <span class="string">istio-system</span>
+<span class="keyword">spec:</span>
+  <span class="property">mtls:</span>
+    <span class="property">mode:</span> <span class="string">STRICT</span></pre>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Authorization with AuthorizationPolicy</h3>
+                <p class="narrative">
+                    <strong>AuthorizationPolicy</strong> controls what services can do. It's Istio's access control mechanism, letting you define fine-grained rules about which services can access which endpoints. Evaluation order: <strong>CUSTOM</strong> → <strong>DENY</strong> → <strong>ALLOW</strong> → implicit deny.
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang yaml">authorization-policy.yaml</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="comment"># Default deny-all for namespace</span>
+<span class="keyword">apiVersion:</span> <span class="string">security.istio.io/v1</span>
+<span class="keyword">kind:</span> <span class="string">AuthorizationPolicy</span>
+<span class="keyword">metadata:</span>
+  <span class="property">name:</span> <span class="string">deny-all</span>
+  <span class="property">namespace:</span> <span class="string">default</span>
+<span class="keyword">spec:</span>
+  <span class="comment">{}</span>
+<span class="keyword">---</span>
+<span class="comment"># Allow specific access</span>
+<span class="keyword">apiVersion:</span> <span class="string">security.istio.io/v1</span>
+<span class="keyword">kind:</span> <span class="string">AuthorizationPolicy</span>
+<span class="keyword">metadata:</span>
+  <span class="property">name:</span> <span class="string">reviews-viewer</span>
+  <span class="property">namespace:</span> <span class="string">default</span>
+<span class="keyword">spec:</span>
+  <span class="property">selector:</span>
+    <span class="property">matchLabels:</span>
+      <span class="property">app:</span> <span class="string">reviews</span>
+  <span class="property">action:</span> <span class="string">ALLOW</span>
+  <span class="property">rules:</span>
+  - <span class="property">from:</span>
+    - <span class="property">source:</span>
+        <span class="property">principals:</span>
+        - <span class="string">"cluster.local/ns/default/sa/bookinfo-productpage"</span>
+    <span class="property">to:</span>
+    - <span class="property">operation:</span>
+        <span class="property">methods:</span>
+        - <span class="string">"GET"</span></pre>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>JWT Authentication</h3>
+                <p class="narrative">
+                    <strong>RequestAuthentication</strong> enables end-user authentication using JSON Web Tokens (JWTs). It validates tokens but doesn't require them—requests without tokens pass through. To require authentication, combine with an AuthorizationPolicy that checks for the presence of a request principal.
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang yaml">jwt-authentication.yaml</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="keyword">apiVersion:</span> <span class="string">security.istio.io/v1</span>
+<span class="keyword">kind:</span> <span class="string">RequestAuthentication</span>
+<span class="keyword">metadata:</span>
+  <span class="property">name:</span> <span class="string">jwt-auth</span>
+<span class="keyword">spec:</span>
+  <span class="property">selector:</span>
+    <span class="property">matchLabels:</span>
+      <span class="property">app:</span> <span class="string">httpbin</span>
+  <span class="property">jwtRules:</span>
+  - <span class="property">issuer:</span> <span class="string">"https://accounts.google.com"</span>
+    <span class="property">jwksUri:</span> <span class="string">"https://www.googleapis.com/oauth2/v3/certs"</span>
+<span class="keyword">---</span>
+<span class="comment"># Require valid JWT</span>
+<span class="keyword">apiVersion:</span> <span class="string">security.istio.io/v1</span>
+<span class="keyword">kind:</span> <span class="string">AuthorizationPolicy</span>
+<span class="keyword">metadata:</span>
+  <span class="property">name:</span> <span class="string">require-jwt</span>
+<span class="keyword">spec:</span>
+  <span class="property">selector:</span>
+    <span class="property">matchLabels:</span>
+      <span class="property">app:</span> <span class="string">httpbin</span>
+  <span class="property">action:</span> <span class="string">ALLOW</span>
+  <span class="property">rules:</span>
+  - <span class="property">from:</span>
+    - <span class="property">source:</span>
+        <span class="property">requestPrincipals:</span>
+        - <span class="string">"*"</span></pre>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Gateway TLS Configuration</h3>
+                <p class="narrative">
+                    The Gateway resource supports three TLS modes: <strong>SIMPLE</strong> (standard TLS termination), <strong>MUTUAL</strong> (client certificate required), and <strong>PASSTHROUGH</strong> (SNI-based routing without termination).
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang bash">bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="comment"># Create TLS secret for Gateway</span>
+kubectl create -n istio-system secret tls bookinfo-credential \
+  --key=bookinfo.example.com.key \
+  --cert=bookinfo.example.com.crt</pre>
+                </div>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang yaml">secure-gateway.yaml</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="keyword">apiVersion:</span> <span class="string">networking.istio.io/v1</span>
+<span class="keyword">kind:</span> <span class="string">Gateway</span>
+<span class="keyword">metadata:</span>
+  <span class="property">name:</span> <span class="string">secure-gateway</span>
+<span class="keyword">spec:</span>
+  <span class="property">selector:</span>
+    <span class="property">istio:</span> <span class="string">ingressgateway</span>
+  <span class="property">servers:</span>
+  - <span class="property">port:</span>
+      <span class="property">number:</span> <span class="number">443</span>
+      <span class="property">name:</span> <span class="string">https</span>
+      <span class="property">protocol:</span> <span class="string">HTTPS</span>
+    <span class="property">hosts:</span>
+    - <span class="string">"bookinfo.example.com"</span>
+    <span class="property">tls:</span>
+      <span class="property">mode:</span> <span class="string">SIMPLE</span>
+      <span class="property">credentialName:</span> <span class="string">bookinfo-credential</span></pre>
+                </div>
+            </div>
+
+            <div class="checklist">
+                <h3>📋 Domain 3 Exam Checklist</h3>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Configure mesh-wide, namespace, and workload-level PeerAuthentication</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Understand mTLS modes: STRICT, PERMISSIVE, DISABLE</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Create ALLOW and DENY AuthorizationPolicies</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Configure RequestAuthentication for JWT validation</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Configure Gateway TLS modes: SIMPLE, MUTUAL, PASSTHROUGH</span>
+                </div>
+            </div>
+
+            <!-- Domain 3 Key Concepts -->
+            <div class="content-block" style="background: linear-gradient(135deg, var(--bg-card), var(--security-bg));">
+                <h3>🔑 Key Concepts to Memorize</h3>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Security Resource</th>
+                                <th>Purpose</th>
+                                <th>Scope Options</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>PeerAuthentication</strong></td><td>mTLS settings (workload identity)</td><td>Mesh → Namespace → Workload</td></tr>
+                            <tr><td><strong>AuthorizationPolicy</strong></td><td>Access control (who can access what)</td><td>Mesh → Namespace → Workload</td></tr>
+                            <tr><td><strong>RequestAuthentication</strong></td><td>JWT validation (end-user identity)</td><td>Namespace → Workload</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-container" style="margin-top: 20px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>AuthorizationPolicy Action</th>
+                                <th>Evaluation Order</th>
+                                <th>Behavior</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="inline-code">CUSTOM</span></td><td>1st</td><td>Delegate to external auth</td></tr>
+                            <tr><td><span class="inline-code">DENY</span></td><td>2nd</td><td>Explicit deny (if matched)</td></tr>
+                            <tr><td><span class="inline-code">ALLOW</span></td><td>3rd</td><td>Explicit allow (if matched)</td></tr>
+                            <tr><td><em>Implicit deny</em></td><td>4th</td><td>Deny if no ALLOW matched (when ALLOW policies exist)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-container" style="margin-top: 20px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Gateway TLS Mode</th>
+                                <th>Client Cert Required?</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="inline-code">SIMPLE</span></td><td>No</td><td>Standard HTTPS (server cert only)</td></tr>
+                            <tr><td><span class="inline-code">MUTUAL</span></td><td>Yes</td><td>mTLS at gateway edge</td></tr>
+                            <tr><td><span class="inline-code">PASSTHROUGH</span></td><td>N/A</td><td>SNI routing, TLS handled by backend</td></tr>
+                            <tr><td><span class="inline-code">AUTO_PASSTHROUGH</span></td><td>N/A</td><td>SNI routing without VirtualService</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box exam" style="margin-top: 20px;">
+                    <div class="info-icon">🎯</div>
+                    <div class="info-content">
+                        <h4>Exam Critical: Principal Formats</h4>
+                        <p><strong>Service Account:</strong> <span class="inline-code">cluster.local/ns/{namespace}/sa/{service-account}</span><br>
+                        <strong>JWT Principal:</strong> <span class="inline-code">{issuer}/{subject}</span><br>
+                        <strong>SPIFFE ID:</strong> <span class="inline-code">spiffe://cluster.local/ns/{namespace}/sa/{service-account}</span></p>
+                    </div>
+                </div>
+
+                <div class="info-box warning" style="margin-top: 16px;">
+                    <div class="info-icon">⚠️</div>
+                    <div class="info-content">
+                        <h4>Common Exam Mistake: Empty Spec</h4>
+                        <p><span class="inline-code">spec: {}</span> in AuthorizationPolicy = <strong>deny all</strong> (zero-trust default)<br>
+                        <span class="inline-code">rules: [{}]</span> in AuthorizationPolicy = <strong>match all</strong> (use with DENY action)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Domain 3 References -->
+            <div class="content-block">
+                <h3>📚 Official Documentation References</h3>
+                <p class="narrative">Bookmark these pages for exam preparation and quick reference:</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 16px;">
+                    <a href="https://istio.io/latest/docs/reference/config/security/peer_authentication/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--security-primary); display: block;">PeerAuthentication Reference</strong>mTLS configuration</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/reference/config/security/authorization-policy/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--security-primary); display: block;">AuthorizationPolicy Reference</strong>Access control rules</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/reference/config/security/request_authentication/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--security-primary); display: block;">RequestAuthentication Reference</strong>JWT validation</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/tasks/security/authentication/mtls-migration/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--security-primary); display: block;">mTLS Migration</strong>PERMISSIVE to STRICT</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/tasks/security/authorization/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--security-primary); display: block;">Authorization Tasks</strong>Policy examples</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/tasks/traffic-management/ingress/secure-ingress/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--security-primary); display: block;">Secure Gateways</strong>TLS at ingress</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Domain 4: Troubleshooting -->
+    <section id="troubleshoot" class="section troubleshoot">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge">Domain 4 • 20% Weight</div>
+                <h2 class="section-title">Troubleshooting</h2>
+                <p class="section-intro">
+                    When things go wrong, you need systematic approaches to diagnose issues. 
+                    This domain covers configuration validation, control plane diagnostics, and data plane debugging.
+                </p>
+            </div>
+
+            <div class="content-block">
+                <h3>Configuration Analysis with istioctl analyze</h3>
+                <p class="narrative">
+                    <strong>istioctl analyze</strong> is your first line of defense against configuration issues. It validates your Istio resources against known problems and best practices, catching issues before they cause production problems.
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang bash">bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="comment"># Analyze all namespaces</span>
+istioctl analyze --all-namespaces
+
+<span class="comment"># Analyze specific namespace</span>
+istioctl analyze -n default
+
+<span class="comment"># Analyze local files without applying</span>
+istioctl analyze --use-kube=false my-config.yaml
+
+<span class="comment"># Suppress specific warnings</span>
+istioctl analyze --suppress "IST0102=Namespace default"</pre>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Proxy Synchronization Status</h3>
+                <p class="narrative">
+                    <strong>istioctl proxy-status</strong> shows whether each sidecar is synchronized with the control plane. All proxies should show "SYNCED" for each configuration type (CDS, LDS, EDS, RDS). A "STALE" status indicates problems.
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang bash">bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="comment"># Check synchronization status of all proxies</span>
+istioctl proxy-status
+
+<span class="comment"># Status meanings:</span>
+<span class="comment"># SYNCED   - Proxy acknowledged latest config</span>
+<span class="comment"># NOT SENT - Nothing to send (normal)</span>
+<span class="comment"># STALE    - Config sent but not acknowledged (problem!)</span></pre>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Config Type</th>
+                                <th>Full Name</th>
+                                <th>What It Configures</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>CDS</td><td>Cluster Discovery</td><td>Upstream clusters (services)</td></tr>
+                            <tr><td>LDS</td><td>Listener Discovery</td><td>Ports proxy listens on</td></tr>
+                            <tr><td>EDS</td><td>Endpoint Discovery</td><td>Actual pod IPs</td></tr>
+                            <tr><td>RDS</td><td>Route Discovery</td><td>VirtualService rules</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Inspecting Proxy Configuration</h3>
+                <p class="narrative">
+                    <strong>istioctl proxy-config</strong> lets you inspect exactly what configuration a sidecar has received—clusters, listeners, routes, endpoints, and secrets. Essential for debugging "why isn't my traffic going where I expect?"
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang bash">bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="comment"># View upstream clusters</span>
+istioctl proxy-config clusters productpage-v1-xxx.default
+
+<span class="comment"># View listeners</span>
+istioctl proxy-config listeners productpage-v1-xxx.default
+
+<span class="comment"># View routes</span>
+istioctl proxy-config routes productpage-v1-xxx.default --name 9080
+
+<span class="comment"># View endpoints</span>
+istioctl proxy-config endpoints productpage-v1-xxx.default
+
+<span class="comment"># View TLS certificates</span>
+istioctl proxy-config secret productpage-v1-xxx.default
+
+<span class="comment"># Get full JSON output</span>
+istioctl proxy-config routes productpage-v1-xxx.default -o json</pre>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Control Plane Troubleshooting</h3>
+                <p class="narrative">
+                    When proxies show STALE status or configuration isn't being applied, the control plane (istiod) is often where you should look first.
+                </p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang bash">bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="comment"># Check istiod pod status</span>
+kubectl get pods -n istio-system -l app=istiod
+
+<span class="comment"># View istiod logs</span>
+kubectl logs -n istio-system -l app=istiod --tail=100
+
+<span class="comment"># Verify version alignment</span>
+istioctl version
+
+<span class="comment"># Describe a workload's Istio config</span>
+istioctl experimental describe pod productpage-v1-xxx.default
+
+<span class="comment"># Check sidecar injection status</span>
+istioctl experimental check-inject -n default deployment/productpage-v1</pre>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Common Issues Quick Reference</h3>
+                
+                <div class="info-box warning">
+                    <div class="info-icon">🔴</div>
+                    <div class="info-content">
+                        <h4>503 Errors After DestinationRule</h4>
+                        <p>Add <span class="inline-code">trafficPolicy.tls.mode: ISTIO_MUTUAL</span> to your DestinationRule when using subsets with mesh-wide mTLS.</p>
+                    </div>
+                </div>
+
+                <div class="info-box warning">
+                    <div class="info-icon">🔴</div>
+                    <div class="info-content">
+                        <h4>NR (No Route) in Access Logs</h4>
+                        <p>The proxy can't find a route for the request. Check VirtualService configuration and ensure the destination service exists.</p>
+                    </div>
+                </div>
+
+                <div class="info-box warning">
+                    <div class="info-icon">🔴</div>
+                    <div class="info-content">
+                        <h4>UO (Upstream Overflow) Flag</h4>
+                        <p>Circuit breaker triggered due to connection pool limits. Review DestinationRule connectionPool settings.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>Observability Tools</h3>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-lang bash">bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+<pre><span class="comment"># Install observability addons</span>
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/addons/prometheus.yaml
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/addons/grafana.yaml
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/addons/jaeger.yaml
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/addons/kiali.yaml
+
+<span class="comment"># Open dashboards</span>
+istioctl dashboard kiali
+istioctl dashboard prometheus
+istioctl dashboard grafana
+istioctl dashboard jaeger</pre>
+                </div>
+            </div>
+
+            <div class="checklist">
+                <h3>📋 Domain 4 Exam Checklist</h3>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Use istioctl analyze to detect configuration issues</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Check proxy synchronization with istioctl proxy-status</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Inspect proxy configuration (clusters, listeners, routes, endpoints)</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Troubleshoot istiod logs and health</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="check-box" onclick="toggleCheck(this)"></div>
+                    <span>Interpret Envoy access log response flags (NR, UO, UF)</span>
+                </div>
+            </div>
+
+            <!-- Domain 4 Key Concepts -->
+            <div class="content-block" style="background: linear-gradient(135deg, var(--bg-card), var(--troubleshoot-bg));">
+                <h3>🔑 Key Concepts to Memorize</h3>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>proxy-config Type</th>
+                                <th>Shows</th>
+                                <th>Use When</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="inline-code">clusters</span></td><td>Upstream services (CDS)</td><td>Service not found, subset issues</td></tr>
+                            <tr><td><span class="inline-code">listeners</span></td><td>Port listeners (LDS)</td><td>Port not accessible, traffic not intercepted</td></tr>
+                            <tr><td><span class="inline-code">routes</span></td><td>Routing rules (RDS)</td><td>Wrong destination, VirtualService not applied</td></tr>
+                            <tr><td><span class="inline-code">endpoints</span></td><td>Pod IPs (EDS)</td><td>No healthy upstream, load balancing issues</td></tr>
+                            <tr><td><span class="inline-code">secret</span></td><td>Certificates</td><td>mTLS failures, certificate expiry</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-container" style="margin-top: 20px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Response Flag</th>
+                                <th>Meaning</th>
+                                <th>Common Cause</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="inline-code">NR</span></td><td>No Route</td><td>VirtualService not matching, missing ServiceEntry</td></tr>
+                            <tr><td><span class="inline-code">UH</span></td><td>No Healthy Upstream</td><td>All endpoints failed health checks</td></tr>
+                            <tr><td><span class="inline-code">UF</span></td><td>Upstream Connection Failure</td><td>Network issues, pod not running</td></tr>
+                            <tr><td><span class="inline-code">UO</span></td><td>Upstream Overflow</td><td>Circuit breaker tripped</td></tr>
+                            <tr><td><span class="inline-code">UC</span></td><td>Upstream Connection Termination</td><td>Connection reset by peer</td></tr>
+                            <tr><td><span class="inline-code">UT</span></td><td>Upstream Request Timeout</td><td>Request exceeded timeout</td></tr>
+                            <tr><td><span class="inline-code">DC</span></td><td>Downstream Connection Termination</td><td>Client disconnected</td></tr>
+                            <tr><td><span class="inline-code">RBAC</span></td><td>RBAC Access Denied</td><td>AuthorizationPolicy blocked request</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-container" style="margin-top: 20px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Istio Port</th>
+                                <th>Purpose</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="inline-code">15000</span></td><td>Envoy admin interface</td></tr>
+                            <tr><td><span class="inline-code">15001</span></td><td>Envoy outbound traffic</td></tr>
+                            <tr><td><span class="inline-code">15006</span></td><td>Envoy inbound traffic</td></tr>
+                            <tr><td><span class="inline-code">15010</span></td><td>Istiod xDS (plaintext)</td></tr>
+                            <tr><td><span class="inline-code">15012</span></td><td>Istiod xDS (mTLS)</td></tr>
+                            <tr><td><span class="inline-code">15014</span></td><td>Istiod metrics</td></tr>
+                            <tr><td><span class="inline-code">15017</span></td><td>Webhook injection</td></tr>
+                            <tr><td><span class="inline-code">15020</span></td><td>Merged Prometheus telemetry</td></tr>
+                            <tr><td><span class="inline-code">15021</span></td><td>Health checks</td></tr>
+                            <tr><td><span class="inline-code">15090</span></td><td>Envoy Prometheus</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box exam" style="margin-top: 20px;">
+                    <div class="info-icon">🎯</div>
+                    <div class="info-content">
+                        <h4>Exam Troubleshooting Workflow</h4>
+                        <p>1. <span class="inline-code">istioctl analyze</span> - Check for config errors<br>
+                        2. <span class="inline-code">istioctl proxy-status</span> - Verify all proxies SYNCED<br>
+                        3. <span class="inline-code">istioctl proxy-config</span> - Inspect specific proxy config<br>
+                        4. Check access logs for response flags<br>
+                        5. <span class="inline-code">kubectl logs -l app=istiod -n istio-system</span> - Control plane logs</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Domain 4 References -->
+            <div class="content-block">
+                <h3>📚 Official Documentation References</h3>
+                <p class="narrative">Bookmark these pages for exam preparation and quick reference:</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 16px;">
+                    <a href="https://istio.io/latest/docs/ops/diagnostic-tools/istioctl-analyze/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--troubleshoot-primary); display: block;">istioctl analyze</strong>Configuration analysis</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/ops/diagnostic-tools/proxy-cmd/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--troubleshoot-primary); display: block;">Debugging Envoy</strong>proxy-config commands</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/tasks/observability/logs/access-log/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--troubleshoot-primary); display: block;">Access Logging</strong>Log format and flags</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/ops/common-problems/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--troubleshoot-primary); display: block;">Common Problems</strong>Troubleshooting guides</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/ops/common-problems/network-issues/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--troubleshoot-primary); display: block;">Network Issues</strong>Traffic problems</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/ops/common-problems/injection/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--troubleshoot-primary); display: block;">Injection Problems</strong>Sidecar issues</span>
+                    </a>
+                    <a href="https://istio.io/latest/docs/reference/config/analysis/" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--troubleshoot-primary); display: block;">Analysis Messages</strong>Error code reference</span>
+                    </a>
+                    <a href="https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage" target="_blank" style="display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg-tertiary); border-radius: 10px; text-decoration: none; color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;">
+                        <span style="font-size: 1.2rem;">📖</span>
+                        <span><strong style="color: var(--troubleshoot-primary); display: block;">Envoy Access Log</strong>Response flag details</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Reference -->
+    <section class="section" style="padding-bottom: 60px;">
+        <div class="container">
+            <div class="content-block">
+                <h3>⚡ Essential Commands Quick Reference</h3>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Command</th>
+                                <th>Purpose</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><span class="inline-code">istioctl install --set profile=&lt;name&gt;</span></td><td>Install Istio with profile</td></tr>
+                            <tr><td><span class="inline-code">istioctl analyze -n &lt;ns&gt;</span></td><td>Detect configuration issues</td></tr>
+                            <tr><td><span class="inline-code">istioctl proxy-status</span></td><td>Check proxy sync status</td></tr>
+                            <tr><td><span class="inline-code">istioctl proxy-config clusters &lt;pod&gt; -n &lt;ns&gt;</span></td><td>View upstream clusters (CDS)</td></tr>
+                            <tr><td><span class="inline-code">istioctl proxy-config routes &lt;pod&gt; -n &lt;ns&gt;</span></td><td>View routing config (RDS)</td></tr>
+                            <tr><td><span class="inline-code">istioctl proxy-config listeners &lt;pod&gt; -n &lt;ns&gt;</span></td><td>View port listeners (LDS)</td></tr>
+                            <tr><td><span class="inline-code">istioctl proxy-config endpoints &lt;pod&gt; -n &lt;ns&gt;</span></td><td>View endpoints (EDS)</td></tr>
+                            <tr><td><span class="inline-code">istioctl proxy-config secret &lt;pod&gt; -n &lt;ns&gt;</span></td><td>View certificates</td></tr>
+                            <tr><td><span class="inline-code">istioctl x describe pod &lt;pod&gt; -n &lt;ns&gt;</span></td><td>Describe pod config</td></tr>
+                            <tr><td><span class="inline-code">istioctl x precheck</span></td><td>Pre-upgrade check</td></tr>
+                            <tr><td><span class="inline-code">istioctl dashboard &lt;tool&gt;</span></td><td>Open dashboards (kiali, grafana, jaeger)</td></tr>
+                            <tr><td><span class="inline-code">istioctl kube-inject -f &lt;file&gt;</span></td><td>Manual sidecar injection</td></tr>
+                            <tr><td><span class="inline-code">kubectl label ns &lt;ns&gt; istio-injection=enabled</span></td><td>Enable auto sidecar injection</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h3>📝 API Resources Quick Reference</h3>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Resource</th>
+                                <th>API Group</th>
+                                <th>Short Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Gateway</td><td><span class="inline-code">networking.istio.io/v1</span></td><td><span class="inline-code">gw</span></td></tr>
+                            <tr><td>VirtualService</td><td><span class="inline-code">networking.istio.io/v1</span></td><td><span class="inline-code">vs</span></td></tr>
+                            <tr><td>DestinationRule</td><td><span class="inline-code">networking.istio.io/v1</span></td><td><span class="inline-code">dr</span></td></tr>
+                            <tr><td>ServiceEntry</td><td><span class="inline-code">networking.istio.io/v1</span></td><td><span class="inline-code">se</span></td></tr>
+                            <tr><td>Sidecar</td><td><span class="inline-code">networking.istio.io/v1</span></td><td>-</td></tr>
+                            <tr><td>PeerAuthentication</td><td><span class="inline-code">security.istio.io/v1</span></td><td><span class="inline-code">pa</span></td></tr>
+                            <tr><td>AuthorizationPolicy</td><td><span class="inline-code">security.istio.io/v1</span></td><td><span class="inline-code">ap</span></td></tr>
+                            <tr><td>RequestAuthentication</td><td><span class="inline-code">security.istio.io/v1</span></td><td><span class="inline-code">ra</span></td></tr>
+                            <tr><td>EnvoyFilter</td><td><span class="inline-code">networking.istio.io/v1alpha3</span></td><td><span class="inline-code">ef</span></td></tr>
+                            <tr><td>WorkloadEntry</td><td><span class="inline-code">networking.istio.io/v1</span></td><td><span class="inline-code">we</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="content-block" style="background: linear-gradient(135deg, var(--bg-card), var(--traffic-bg));">
+                <h3>🎯 Final Exam Tips</h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 16px;">
+                    <div style="background: var(--bg-primary); padding: 20px; border-radius: 12px;">
+                        <h4 style="color: var(--install-primary); margin-bottom: 12px;">⚙️ Installation</h4>
+                        <ul style="color: var(--text-secondary); font-size: 0.9rem; margin-left: 16px;">
+                            <li>Know all profile differences</li>
+                            <li>Restart pods after changing labels</li>
+                            <li>Revisions for canary upgrades</li>
+                        </ul>
+                    </div>
+                    <div style="background: var(--bg-primary); padding: 20px; border-radius: 12px;">
+                        <h4 style="color: var(--traffic-primary); margin-bottom: 12px;">🔀 Traffic</h4>
+                        <ul style="color: var(--text-secondary); font-size: 0.9rem; margin-left: 16px;">
+                            <li>VirtualService = WHERE (routing)</li>
+                            <li>DestinationRule = HOW (policy)</li>
+                            <li>Weights must sum to 100</li>
+                        </ul>
+                    </div>
+                    <div style="background: var(--bg-primary); padding: 20px; border-radius: 12px;">
+                        <h4 style="color: var(--security-primary); margin-bottom: 12px;">🔐 Security</h4>
+                        <ul style="color: var(--text-secondary); font-size: 0.9rem; margin-left: 16px;">
+                            <li>Empty spec {} = deny all</li>
+                            <li>Mesh-wide PA in istio-system</li>
+                            <li>DENY → ALLOW → implicit deny</li>
+                        </ul>
+                    </div>
+                    <div style="background: var(--bg-primary); padding: 20px; border-radius: 12px;">
+                        <h4 style="color: var(--troubleshoot-primary); margin-bottom: 12px;">🔧 Troubleshoot</h4>
+                        <ul style="color: var(--text-secondary); font-size: 0.9rem; margin-left: 16px;">
+                            <li>analyze → proxy-status → proxy-config</li>
+                            <li>Know response flags (NR, UH, UO)</li>
+                            <li>Check istio-proxy container logs</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-box note" style="margin-top: 24px;">
+                    <div class="info-icon">⏱️</div>
+                    <div class="info-content">
+                        <h4>Time Management (2-Hour Exam)</h4>
+                        <ul style="margin: 8px 0 0 16px; color: var(--text-secondary);">
+                            <li><strong style="color: var(--install-primary);">Installation (20%)</strong> — ~24 minutes</li>
+                            <li><strong style="color: var(--traffic-primary);">Traffic Management (35%)</strong> — ~42 minutes</li>
+                            <li><strong style="color: var(--security-primary);">Security (20%)</strong> — ~24 minutes</li>
+                            <li><strong style="color: var(--troubleshoot-primary);">Troubleshooting (20%)</strong> — ~24 minutes</li>
+                            <li><strong style="color: var(--text-primary);">Review & Buffer</strong> — ~6 minutes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Conclusion Section -->
+    <section class="section" style="padding: 40px 0 80px;">
+        <div class="container">
+            <div class="content-block" style="text-align: center; background: linear-gradient(135deg, var(--bg-card) 0%, rgba(6, 182, 212, 0.1) 25%, rgba(139, 92, 246, 0.1) 50%, rgba(16, 185, 129, 0.1) 75%, rgba(245, 158, 11, 0.1) 100%); border: 1px solid var(--bg-tertiary); position: relative; overflow: hidden;">
+                
+                <!-- Decorative gradient bar -->
+                <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--install-primary), var(--traffic-primary), var(--security-primary), var(--troubleshoot-primary));"></div>
+                
+                <div style="font-size: 3rem; margin-bottom: 20px;">🎓</div>
+                <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; margin-bottom: 16px; background: linear-gradient(135deg, var(--text-primary), var(--traffic-primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">You're Ready to Conquer the ICA Exam!</h3>
+                
+                <p class="narrative" style="max-width: 700px; margin: 0 auto 24px; font-size: 1.1rem;">
+                    You've covered all four domains of the Istio Certified Associate exam. Remember, consistent hands-on practice is the key to success. Don't just read—<strong>deploy, configure, break, and fix</strong> things in your lab environment.
+                </p>
+
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 28px 0;">
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: var(--install-bg); border: 1px solid var(--install-border); border-radius: 100px;">
+                        <span>⚙️</span>
+                        <span style="color: var(--install-primary); font-weight: 600;">Install</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: var(--traffic-bg); border: 1px solid var(--traffic-border); border-radius: 100px;">
+                        <span>🔀</span>
+                        <span style="color: var(--traffic-primary); font-weight: 600;">Route</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: var(--security-bg); border: 1px solid var(--security-border); border-radius: 100px;">
+                        <span>🔐</span>
+                        <span style="color: var(--security-primary); font-weight: 600;">Secure</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: var(--troubleshoot-bg); border: 1px solid var(--troubleshoot-border); border-radius: 100px;">
+                        <span>🔧</span>
+                        <span style="color: var(--troubleshoot-primary); font-weight: 600;">Debug</span>
+                    </div>
+                </div>
+
+                <div style="background: var(--bg-primary); border-radius: 16px; padding: 24px; margin: 24px auto; max-width: 600px;">
+                    <p style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 16px;">
+                        <em>"The service mesh is not just about connecting services—it's about understanding, securing, and observing those connections."</em>
+                    </p>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap;">
+                        <a href="https://training.linuxfoundation.org/certification/istio-certified-associate-ica/" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: linear-gradient(135deg, var(--traffic-primary), var(--install-primary)); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: transform 0.2s, box-shadow 0.2s;">
+                            <span>📝</span> Register for ICA Exam
+                        </a>
+                        <a href="https://istio.io/latest/docs/" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: var(--bg-tertiary); color: var(--text-primary); text-decoration: none; border-radius: 8px; font-weight: 600; border: 1px solid var(--text-muted); transition: all 0.2s;">
+                            <span>📚</span> Istio Docs
+                        </a>
+                    </div>
+                </div>
+
+                <p style="color: var(--security-primary); font-size: 1.2rem; font-weight: 600; margin-top: 20px;">
+                    🚀 Good luck on your certification journey!
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-links">
+            <a href="https://istio.io/latest/docs/" target="_blank">Istio Documentation</a>
+            <a href="https://training.linuxfoundation.org/certification/istio-certified-associate-ica/" target="_blank">ICA Certification</a>
+            <a href="https://github.com/istio/istio" target="_blank">Istio GitHub</a>
+            <a href="https://istio.io/latest/docs/ops/diagnostic-tools/" target="_blank">Diagnostic Tools</a>
+        </div>
+        <p class="footer-credit">
+            Istio Certified Associate Study Guide • Comprehensive Exam Preparation
+        </p>
+    </footer>
+
+    <script>
+        function copyCode(btn) {
+            const pre = btn.closest('.code-container').querySelector('pre');
+            navigator.clipboard.writeText(pre.innerText).then(() => {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+        function toggleCheck(box) { box.classList.toggle('checked'); }
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
